@@ -94,11 +94,11 @@ jobs:
 
       - name: upload cleanup
         run: | 
-          rm -rf /home/runner/.pkg-builder/packages/${{needs.extract_dirs.outputs.codename}}/${{needs.extract_dirs.outputs.package-name}}/${{needs.extract_dirs.outputs.package-name}}-1.0.0
-         # copy pkg-builder configs to artifacts
-          cd /home/runner/.pkg-builder/packages/${{needs.extract_dirs.outputs.codename}}/${{needs.extract_dirs.outputs.package-name}}
-          cp ${{ needs.extract_dirs.outputs.tag_name }}/pkg-builder.toml .
-          cp ${{ needs.extract_dirs.outputs.tag_name }}/pkg-builder-verify.toml .
+          rm -rf /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}/${{extract_dirs.outputs.package-name}}/${{extract_dirs.outputs.package-name}}-1.0.0
+          # copy pkg-builder configs to artifacts
+          cd /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}/${{extract_dirs.outputs.package-name}}
+          cp ${{ extract_dirs.outputs.tag_name }}/pkg-builder.toml .
+          cp ${{ extract_dirs.outputs.tag_name }}/pkg-builder-verify.toml .
           rm *:*
           rm *dbgsym* || true # possible there is none
 
@@ -116,4 +116,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{inputs.ref }}
-          path: /home/runner/.pkg-builder/packages/${{needs.extract_dirs.outputs.codename}}/${{needs.extract_dirs.outputs.package-name}}
+          path: /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}
+          directory: ${{extract_dirs.outputs.package-name}}
+          asset_content_type: application/octet-stream
