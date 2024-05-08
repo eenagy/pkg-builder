@@ -6,7 +6,7 @@ on:
       - examples/**
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +23,7 @@ jobs:
           CODENAME=$(echo $TAG_NAME | cut -d'/' -f2)
           PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
+          echo "::set-output name=tag_name::TA_NAME"
           echo "::set-output name=codename::$CODENAME"
           echo "::set-output name=package_name::$PACKAGE_NAME"
           echo "::set-output name=folder::$FOLDER"
