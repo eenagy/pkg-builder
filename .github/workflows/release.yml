@@ -24,8 +24,8 @@ jobs:
           PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
           echo "::set-output name=codename::$CODENAME"
-          echo "::set-output name=package_name::PACKAGE_NAME"
-          echo "::set-output name=folder::FOLDER"
+          echo "::set-output name=package_name::$PACKAGE_NAME"
+          echo "::set-output name=folder::$FOLDER"
           # echo "::set-output name=arch::$ARCH"  
 
       - name: Sbuild setup
@@ -62,14 +62,14 @@ jobs:
 
       - name: Create chroot env
         run: |
-          cd ${{ needs.extract_dirs.outputs.tag_name }}
+          cd ${{ steps.extract_dirs.outputs.tag_name }}
           sudo ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/noble
           pkg-builder env create
-          echo "${HOME}/.cache/sbuild/${{ needs.extract_dirs.outputs.codename }}-amd64.tar.gz" >> $GITHUB_PATH
+          echo "${HOME}/.cache/sbuild/${{ steps.extract_dirs.outputs.codename }}-amd64.tar.gz" >> $GITHUB_PATH
 
       - name: package
         run: |
-          cd ${{ needs.extract_dirs.outputs.tag_name }}
+          cd ${{ steps.extract_dirs.outputs.tag_name }}
           pkg-builder package --run-piuparts false --run-autopkgtest false --run-lintian false
 
 
@@ -77,28 +77,28 @@ jobs:
         run: |
           # installing debian-archive-keyring fails on ubuntu LTS, not sure why, but it says it is already installed
           # sudo apt-get install -y debian-archive-keyring
-          cd ${{ needs.extract_dirs.outputs.tag_name }}
+          cd ${{ steps.extract_dirs.outputs.tag_name }}
           ${HOME}/.local/bin/pkg-builder piuparts
 
       - name: autopkgtest
         run: |
           sudo cp -R ${HOME}/.pkg-builder /root
           apt list --installed autopkgtest
-          cd ${{ needs.extract_dirs.outputs.tag_name }}
+          cd ${{ steps.extract_dirs.outputs.tag_name }}
           sudo ${HOME}/.local/bin/pkg-builder autopkgtest
 
       - name: verify
         run: |
-          cd ${{ needs.extract_dirs.outputs.tag_name }}
+          cd ${{ steps.extract_dirs.outputs.tag_name }}
           ${HOME}/.local/bin/pkg-builder verify  --no-package true
 
       - name: upload cleanup
         run: | 
-          rm -rf /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}/${{extract_dirs.outputs.package-name}}/${{extract_dirs.outputs.package-name}}-1.0.0
+          rm -rf /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package-name}}/${{steps.extract_dirs.outputs.package-name}}-1.0.0
           # copy pkg-builder configs to artifacts
-          cd /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}/${{extract_dirs.outputs.package-name}}
-          cp ${{ extract_dirs.outputs.tag_name }}/pkg-builder.toml .
-          cp ${{ extract_dirs.outputs.tag_name }}/pkg-builder-verify.toml .
+          cd /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package-name}}
+          cp ${{ steps.extract_dirs.outputs.tag_name }}/pkg-builder.toml .
+          cp ${{ steps.extract_dirs.outputs.tag_name }}/pkg-builder-verify.toml .
           rm *:*
           rm *dbgsym* || true # possible there is none
 
@@ -116,6 +116,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{inputs.ref }}
-          path: /home/runner/.pkg-builder/packages/${{extract_dirs.outputs.codename}}
-          directory: ${{extract_dirs.outputs.package-name}}
+          path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}
+          directory: ${{steps.extract_dirs.outputs.package-name}}
           asset_content_type: application/octet-stream
