@@ -24,6 +24,7 @@ jobs:
           #PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
           PACKAGE_NAME="test-virtual-package"
           VERSION_NUMBER="1.0.0-1"
+          VERSION_NUMBER_WITHOUT_REVISON="1.0.0"
           ARCH="amd64"
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
           echo "::set-output name=tag_name::$TAG_NAME"
@@ -31,6 +32,7 @@ jobs:
           echo "::set-output name=package_name::$PACKAGE_NAME"
           echo "::set-output name=folder::$FOLDER"
           echo "::set-output name=version_number::$VERSION_NUMBER"
+          echo "::set-output name=version_number_without_revision::$VERSION_NUMBER_WITHOUT_REVISON"
           echo "::set-output name=arch::$ARCH"  
 
       - name: Sbuild setup
@@ -145,8 +147,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.orig.tar.gz
-          asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.orig.tar.gz
+          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number_without_revision}}.orig.tar.gz
+          asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number_without_revision}}.orig.tar.gz
           asset_content_type: application/octet-stream
 
       - name: Save .debian.tar.xz
