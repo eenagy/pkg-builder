@@ -78,8 +78,8 @@ jobs:
         run: |
           cd ${{ steps.extract_dirs.outputs.tag_name }}
           pkg-builder package --run-piuparts false --run-autopkgtest false --run-lintian false
-          echo "${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}" >> $GITHUB_PATH
-          ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}
+          echo "${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}" >> $GITHUB_PATH
+          ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}
       
 
       #
@@ -150,7 +150,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number_without_revision}}.orig.tar.gz
+          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number_without_revision}}.orig.tar.gz
           asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number_without_revision}}.orig.tar.gz
           asset_content_type: application/octet-stream
 
@@ -160,7 +160,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.debian.tar.xz
+          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.debian.tar.xz
           asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.debian.tar.xz
           asset_content_type: application/octet-stream
 
@@ -170,7 +170,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.dsc
+          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.dsc
           asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.dsc
           asset_content_type: application/octet-stream
 
@@ -180,6 +180,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}_${{steps.extract_dirs.outputs.arch}}.build
+          asset_path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}_${{steps.extract_dirs.outputs.arch}}.build
           asset_name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}_${{steps.extract_dirs.outputs.arch}}.build
           asset_content_type: application/octet-stream
