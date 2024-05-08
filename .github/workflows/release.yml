@@ -78,8 +78,11 @@ jobs:
         run: |
           cd ${{ steps.extract_dirs.outputs.tag_name }}
           pkg-builder package --run-piuparts false --run-autopkgtest false --run-lintian false
+          echo "${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}" >> $GITHUB_PATH
+          ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}
+      
 
-#
+      #
 #      - name: piuparts
 #        run: |
 #          # installing debian-archive-keyring fails on ubuntu LTS, not sure why, but it says it is already installed
