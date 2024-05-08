@@ -100,8 +100,8 @@ jobs:
           # copy pkg-builder configs to artifacts
           ls -la ${HOME}/.pkg-builder/packages
           ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}
-          cp ${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/pkg-builder.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
-          cp ${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/pkg-builder-verify.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
+          cp ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
+          cp ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder-verify.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
           cd ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
           rm *:*
           rm *dbgsym* || true # possible there is none
