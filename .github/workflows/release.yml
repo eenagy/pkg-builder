@@ -17,7 +17,7 @@ jobs:
       - name: Extract directories
         id: extract_dirs
         run: |
-          TAG_NAME=$(echo ${{ github.ref }} | sed 's/refs\/tags\///'
+          TAG_NAME=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')
           FOLDER=$(echo $TAG_NAME | sed 's/^[^\/]*\///')
           # Extract the second and third directories from the tag name
           CODENAME=$(echo $TAG_NAME | cut -d'/' -f2)
