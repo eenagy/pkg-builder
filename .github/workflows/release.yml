@@ -23,12 +23,15 @@ jobs:
           CODENAME=$(echo $TAG_NAME | cut -d'/' -f2)
           #PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
           PACKAGE_NAME="test-virtual-package"
+          VERSION_NUMBER="1.0.0-1"
+          ARCH="amd64"
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
           echo "::set-output name=tag_name::$TAG_NAME"
           echo "::set-output name=codename::$CODENAME"
           echo "::set-output name=package_name::$PACKAGE_NAME"
           echo "::set-output name=folder::$FOLDER"
-          # echo "::set-output name=arch::$ARCH"  
+          echo "::set-output name=version_number::$VERSION_NUMBER"
+          echo "::set-output name=arch::$ARCH"  
 
       - name: Sbuild setup
         run: |
@@ -67,7 +70,7 @@ jobs:
           cd ${{ steps.extract_dirs.outputs.tag_name }}
           sudo ln -s /usr/share/debootstrap/scripts/gutsy /usr/share/debootstrap/scripts/noble
           pkg-builder env create
-          echo "${HOME}/.cache/sbuild/${{ steps.extract_dirs.outputs.codename }}-amd64.tar.gz" >> $GITHUB_PATH
+          echo "${HOME}/.cache/sbuild/${{ steps.extract_dirs.outputs.codename }}-${{ steps.extract_dirs.outputs.arch }}.tar.gz" >> $GITHUB_PATH
 
       - name: package
         run: |
@@ -94,18 +97,6 @@ jobs:
 #          cd ${{ steps.extract_dirs.outputs.tag_name }}
 #          ${HOME}/.local/bin/pkg-builder verify  --no-package true
 
-      - name: upload cleanup
-        run: | 
-          rm -rf ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1/${{steps.extract_dirs.outputs.package_name}}-1.0.0
-          # copy pkg-builder configs to artifacts
-          ls -la ${HOME}/.pkg-builder/packages
-          ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}
-          cp ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
-          cp ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder-verify.toml ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
-          cd ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-1.0.0-1
-          rm *:*
-          rm *dbgsym* || true # possible there is none
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -117,13 +108,73 @@ jobs:
           draft: false
           prerelease: false
 
-          # This should come after verify, but sometimes it is good to have it, to check why the verify fails
-      - name: Save results
+      # This should come after verify, but sometimes it is good to have it, to check why the verify fails
+      - name: Save ${{ steps.extract_dirs.outputs.codename }}-${{ steps.extract_dirs.outputs.arch }}.tar.gz
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          path: ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}
-          directory: ${{steps.extract_dirs.outputs.package_name}}
+          asset-path: ${HOME}/.cache/sbuild/${{ steps.extract_dirs.outputs.codename }}-${{ steps.extract_dirs.outputs.arch }}.tar.gz
+          asset-name: Save ${{ steps.extract_dirs.outputs.codename }}-${{ steps.extract_dirs.outputs.arch }}.tar.gz
+          asset_content_type: application/octet-stream
+
+      - name: Save pkg-builder.toml
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path:  ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder.toml
+          asset-name: pkg-builder.toml
+          asset_content_type: text/toml
+
+      - name: Save pkg-builder-verify.toml
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path: ${{steps.extract_dirs.outputs.tag_name}}/pkg-builder-verify.toml
+          asset-name: pkg-builder-verify.toml
+          asset_content_type: text/toml
+
+      - name: Save .orig.tar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path: ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.orig.tar.gz
+          asset-name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.orig.tar.gz
+          asset_content_type: application/octet-stream
+
+      - name: Save .debian.tar.xz
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path: ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.debian.tar.xz
+          asset-name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.debian.tar.xz
+          asset_content_type: application/octet-stream
+
+      - name: Save .dsc
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path: ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.dsc
+          asset-name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}.dsc
+          asset_content_type: application/octet-stream
+
+      - name: Save .build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset-path: ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}/${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}_${{steps.extract_dirs.outputs.arch}}.build
+          asset-name: ${{steps.extract_dirs.outputs.package_name}}_${{steps.extract_dirs.outputs.version_number}}_${{steps.extract_dirs.outputs.arch}}.build
           asset_content_type: application/octet-stream
