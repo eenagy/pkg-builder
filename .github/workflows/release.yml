@@ -6,7 +6,7 @@ on:
       - examples/**
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +23,7 @@ jobs:
           CODENAME=$(echo $TAG_NAME | cut -d'/' -f2)
           PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
-          echo "::set-output name=tag_name::TA_NAME"
+          echo "::set-output name=tag_name::$TAG_NAME"
           echo "::set-output name=codename::$CODENAME"
           echo "::set-output name=package_name::$PACKAGE_NAME"
           echo "::set-output name=folder::$FOLDER"
@@ -114,9 +114,9 @@ jobs:
 
           # This should come after verify, but sometimes it is good to have it, to check why the verify fails
       - name: Save results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-release-asset@v1
         with:
-          name: ${{inputs.ref }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           path: /home/runner/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}
           directory: ${{steps.extract_dirs.outputs.package-name}}
           asset_content_type: application/octet-stream
