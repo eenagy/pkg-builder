@@ -79,7 +79,6 @@ jobs:
           cd ${{ steps.extract_dirs.outputs.tag_name }}
           pkg-builder package --run-piuparts false --run-autopkgtest false --run-lintian false
           echo "${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}" >> $GITHUB_PATH
-          ls -la ${HOME}/.pkg-builder/packages/${{steps.extract_dirs.outputs.codename}}/${{steps.extract_dirs.outputs.package_name}}-${{steps.extract_dirs.outputs.version_number}}
       
 
       #
@@ -109,7 +108,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: "Release ${{ steps.extract_dirs.outputs.package_name }} distribution: ${{ steps.extract_dirs.outputs.codename }} arch: ${{ steps.extract_dirs.outputs.codename }} version_number: ${{ steps.extract_dirs.outputs.version_number }}"
           draft: false
           prerelease: false
 
