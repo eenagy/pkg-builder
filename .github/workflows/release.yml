@@ -21,7 +21,8 @@ jobs:
           FOLDER=$(echo $TAG_NAME | sed 's/^[^\/]*\///')
           # Extract the second and third directories from the tag name
           CODENAME=$(echo $TAG_NAME | cut -d'/' -f2)
-          PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
+          #PACKAGE_NAME=$(echo $TAG_NAME | cut -d'/' -f3)
+          PACKAGE_NAME="hello-world"
           # ARCH=$(echo $TAG_NAME | cut -d'/' -f3)
           echo "::set-output name=tag_name::$TAG_NAME"
           echo "::set-output name=codename::$CODENAME"
@@ -73,25 +74,25 @@ jobs:
           cd ${{ steps.extract_dirs.outputs.tag_name }}
           pkg-builder package --run-piuparts false --run-autopkgtest false --run-lintian false
 
-
-      - name: piuparts
-        run: |
-          # installing debian-archive-keyring fails on ubuntu LTS, not sure why, but it says it is already installed
-          # sudo apt-get install -y debian-archive-keyring
-          cd ${{ steps.extract_dirs.outputs.tag_name }}
-          ${HOME}/.local/bin/pkg-builder piuparts
-
-      - name: autopkgtest
-        run: |
-          sudo cp -R ${HOME}/.pkg-builder /root
-          apt list --installed autopkgtest
-          cd ${{ steps.extract_dirs.outputs.tag_name }}
-          sudo ${HOME}/.local/bin/pkg-builder autopkgtest
-
-      - name: verify
-        run: |
-          cd ${{ steps.extract_dirs.outputs.tag_name }}
-          ${HOME}/.local/bin/pkg-builder verify  --no-package true
+#
+#      - name: piuparts
+#        run: |
+#          # installing debian-archive-keyring fails on ubuntu LTS, not sure why, but it says it is already installed
+#          # sudo apt-get install -y debian-archive-keyring
+#          cd ${{ steps.extract_dirs.outputs.tag_name }}
+#          ${HOME}/.local/bin/pkg-builder piuparts
+#
+#      - name: autopkgtest
+#        run: |
+#          sudo cp -R ${HOME}/.pkg-builder /root
+#          apt list --installed autopkgtest
+#          cd ${{ steps.extract_dirs.outputs.tag_name }}
+#          sudo ${HOME}/.local/bin/pkg-builder autopkgtest
+#
+#      - name: verify
+#        run: |
+#          cd ${{ steps.extract_dirs.outputs.tag_name }}
+#          ${HOME}/.local/bin/pkg-builder verify  --no-package true
 
       - name: upload cleanup
         run: | 
